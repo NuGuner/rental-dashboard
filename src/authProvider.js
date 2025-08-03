@@ -20,6 +20,16 @@ const authProvider = {
 
     currentUser = data?.user || null; // เก็บข้อมูลผู้ใช้
     return Promise.resolve();
+// authProvider.js
+import { supabase } from './supabaseClient';
+
+const authProvider = {
+  login: async ({ username, password }) => {
+    const { error } = await supabase.auth.signInWithPassword({
+      email: username,
+      password,
+    });
+    if (error) throw new Error(error.message);
   },
 
   logout: async () => {
@@ -35,6 +45,16 @@ const authProvider = {
   },
 
   checkError: () => Promise.resolve(),
+    if (!data.session) throw new Error('Not authenticated');
+    return Promise.resolve();
+  },
+
+  checkError: (error) => {
+    if (error.status === 401 || error.status === 403) {
+      return Promise.reject();
+    }
+    return Promise.resolve();
+  },
 
   getPermissions: () => Promise.resolve(),
 
@@ -55,6 +75,12 @@ const authProvider = {
     }
 
     return Promise.resolve(undefined);
+    const { data, error } = await supabase.auth.getUser();
+    if (error || !data?.user) return null;
+    return {
+      id: data.user.id,
+      fullName: data.user.email,
+    };
   },
 };
 

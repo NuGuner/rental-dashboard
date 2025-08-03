@@ -5,7 +5,6 @@ const supabaseDataProvider = {
     const { page, perPage } = params.pagination;
     const { field, order } = params.sort;
     const { filter } = params;
-
     const from = (page - 1) * perPage;
     const to = from + perPage - 1;
 
@@ -27,7 +26,6 @@ const supabaseDataProvider = {
 
     const { data, error, count } = await query;
     if (error) throw new Error(error.message);
-
     return {
       data: data.map(item => ({ ...item, id: item.id })),
       total: count,
@@ -58,7 +56,6 @@ const supabaseDataProvider = {
     const { target, id } = params;
     const { page, perPage } = params.pagination;
     const { field, order } = params.sort;
-
     const from = (page - 1) * perPage;
     const to = from + perPage - 1;
 

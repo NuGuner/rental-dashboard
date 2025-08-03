@@ -1,3 +1,4 @@
+// src/components/TenantList.js
 import React from 'react';
 import {
   List,
@@ -17,6 +18,7 @@ export const TenantList = () => (
   <List>
     <Datagrid rowClick="edit">
       <TextField source="id" label="รหัสผู้เช่า" />
+      <TextField source="id" />
       <TextField source="full_name" label="ชื่อ-นามสกุล" />
       <TextField source="phone" label="เบอร์โทร" />
       <EmailField source="email" label="อีเมล" />
@@ -34,6 +36,10 @@ export const TenantEdit = () => (
       <TextInput source="phone" label="เบอร์โทร" validate={[required()]} />
       <TextInput source="email" label="อีเมล" />
       <TextInput source="address" label="ที่อยู่" validate={[required()]} />
+      <TextInput source="full_name" label="ชื่อ-นามสกุล" />
+      <TextInput source="phone" label="เบอร์โทร" />
+      <TextInput source="email" label="อีเมล" />
+      <TextInput source="address" label="ที่อยู่" />
     </SimpleForm>
   </Edit>
 );
@@ -45,6 +51,10 @@ export const TenantCreate = () => (
       <TextInput source="phone" label="เบอร์โทร" validate={[required()]} />
       <TextInput source="email" label="อีเมล" validate={[required()]} />
       <TextInput source="address" label="ที่อยู่" validate={[required()]} />
+      <TextInput source="full_name" label="ชื่อ-นามสกุล" />
+      <TextInput source="phone" label="เบอร์โทร" />
+      <TextInput source="email" label="อีเมล" />
+      <TextInput source="address" label="ที่อยู่" />
     </SimpleForm>
   </Create>
 );
