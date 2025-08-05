@@ -1,4 +1,3 @@
-// src/components/RoomList.js
 import React from 'react';
 import {
   List,
@@ -12,16 +11,17 @@ import {
   TextInput,
   NumberInput,
   Create,
+  required,
 } from 'react-admin';
 
 export const RoomList = () => (
   <List>
     <Datagrid rowClick="edit">
-      <TextField source="id" />
-      <TextField source="name" label="ชื่อห้อง" />
+      <TextField source="id" label="รหัสห้อง" />
+      <TextField source="room_name" label="ชื่อห้อง" />
       <TextField source="location" label="ที่ตั้ง" />
       <NumberField source="size" label="ขนาด (ตร.ม.)" />
-      <NumberField source="price" label="ราคาเช่าต่อเดือน" />
+      <NumberField source="monthly_rent" label="ราคาเช่าต่อเดือน" />
       <TextField source="status" label="สถานะ" />
       <EditButton />
       <DeleteButton />
@@ -32,11 +32,11 @@ export const RoomList = () => (
 export const RoomEdit = () => (
   <Edit>
     <SimpleForm>
-      <TextInput source="name" label="ชื่อห้อง" />
-      <TextInput source="location" label="ที่ตั้ง" />
-      <NumberInput source="size" label="ขนาด (ตร.ม.)" />
-      <NumberInput source="price" label="ราคาเช่าต่อเดือน" />
-      <TextInput source="status" label="สถานะ" />
+      <TextInput source="room_name" label="ชื่อห้อง" validate={[required()]} />
+      <TextInput source="location" label="ที่ตั้ง" validate={[required()]} />
+      <NumberInput source="size" label="ขนาด (ตร.ม.)" validate={[required()]} />
+      <NumberInput source="monthly_rent" label="ราคาเช่าต่อเดือน" validate={[required()]} />
+      <TextInput source="status" label="สถานะ" validate={[required()]} />
     </SimpleForm>
   </Edit>
 );
@@ -44,11 +44,11 @@ export const RoomEdit = () => (
 export const RoomCreate = () => (
   <Create>
     <SimpleForm>
-      <TextInput source="name" label="ชื่อห้อง" />
-      <TextInput source="location" label="ที่ตั้ง" />
-      <NumberInput source="size" label="ขนาด (ตร.ม.)" />
-      <NumberInput source="price" label="ราคาเช่าต่อเดือน" />
-      <TextInput source="status" label="สถานะ" />
+      <TextInput source="room_name" label="ชื่อห้อง" validate={[required()]} />
+      <TextInput source="location" label="ที่ตั้ง" validate={[required()]} />
+      <NumberInput source="size" label="ขนาด (ตร.ม.)" validate={[required()]} />
+      <NumberInput source="monthly_rent" label="ราคาเช่าต่อเดือน" validate={[required()]} />
+      <TextInput source="status" label="สถานะ" validate={[required()]} />
     </SimpleForm>
   </Create>
 );
