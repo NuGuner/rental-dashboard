@@ -1,8 +1,27 @@
 import React, { useEffect, useState } from 'react';
-import { Card, CardContent, Typography, Grid } from '@mui/material';
-import HomeIcon from '@mui/icons-material/Home';
-import PeopleIcon from '@mui/icons-material/People';
-import DescriptionIcon from '@mui/icons-material/Description';
+import { 
+  Card, 
+  CardContent, 
+  Typography, 
+  Grid, 
+  Box,
+  LinearProgress,
+  Chip,
+  Avatar,
+  IconButton,
+  Fade,
+  Grow
+} from '@mui/material';
+import {
+  Home as HomeIcon,
+  People as PeopleIcon,
+  Description as DescriptionIcon,
+  TrendingUp as TrendingUpIcon,
+  Warning as WarningIcon,
+  CheckCircle as CheckCircleIcon,
+  Schedule as ScheduleIcon,
+  Refresh as RefreshIcon
+} from '@mui/icons-material';
 import { supabase } from '../supabaseClient';
 import dayjs from 'dayjs';
 
@@ -12,96 +31,362 @@ const CustomDashboard = () => {
   const [contractCount, setContractCount] = useState(0);
   const [rentedCount, setRentedCount] = useState(0);
   const [expiringContracts, setExpiringContracts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchCounts = async () => {
-      // ดึงจำนวนข้อมูลทั้งหมด
-      const rooms = await supabase.from('rooms').select('*', { count: 'exact' });
-      const tenants = await supabase.from('tenants').select('*', { count: 'exact' });
-      const contracts = await supabase.from('contracts').select('*', { count: 'exact' });
+      try {
+        setLoading(true);
+        
+        // ดึงจำนวนข้อมูลทั้งหมด
+        const rooms = await supabase.from('rooms').select('*', { count: 'exact' });
+        const tenants = await supabase.from('tenants').select('*', { count: 'exact' });
+        const contracts = await supabase.from('contracts').select('*', { count: 'exact' });
 
-      if (rooms.count) setRoomCount(rooms.count);
-      if (tenants.count) setTenantCount(tenants.count);
-      if (contracts.count) setContractCount(contracts.count);
+        if (rooms.count) setRoomCount(rooms.count);
+        if (tenants.count) setTenantCount(tenants.count);
+        if (contracts.count) setContractCount(contracts.count);
 
-      // ดึงจำนวนห้องที่มีการเช่า
-      const rentedRooms = await supabase
-        .from('rooms')
-        .select('*')
-        .eq('status', 'มีผู้เช่า');
-      
-      if (rentedRooms.data) setRentedCount(rentedRooms.data.length);
+        // ดึงจำนวนห้องที่มีการเช่า
+        const rentedRooms = await supabase
+          .from('rooms')
+          .select('*')
+          .eq('status', 'มีผู้เช่า');
+        
+        if (rentedRooms.data) setRentedCount(rentedRooms.data.length);
 
-      // ดึงสัญญาที่ใกล้หมดอายุ (ภายใน 30 วัน)
-      const today = dayjs();
-      const next30 = today.add(30, 'day').format('YYYY-MM-DD');
+        // ดึงสัญญาที่ใกล้หมดอายุ (ภายใน 30 วัน)
+        const today = dayjs();
+        const next30 = today.add(30, 'day').format('YYYY-MM-DD');
 
-      const expiringData = await supabase
-        .from('contracts')
-        .select('*')
-        .lte('end_date', next30);
-      
-      if (expiringData.data) setExpiringContracts(expiringData.data);
+        const expiringData = await supabase
+          .from('contracts')
+          .select('*')
+          .lte('end_date', next30)
+          .eq('status', 'ใช้งาน');
+        
+        if (expiringData.data) setExpiringContracts(expiringData.data);
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchCounts();
   }, []);
 
-  return (
-    <div>
-      <Grid container spacing={2}>
-        <Grid item xs={12} md={4}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                <HomeIcon /> ห้องทั้งหมด
+  const occupancyRate = roomCount > 0 ? Math.round((rentedCount / roomCount) * 100) : 0;
+
+  const StatCard = ({ icon, title, value, subtitle, color, gradient, delay = 0 }) => (
+    <Grow in={!loading} timeout={1000} style={{ transitionDelay: `${delay}ms` }}>
+      <Card
+        sx={{
+          position: 'relative',
+          overflow: 'hidden',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: '4px',
+            background: gradient,
+          },
+          '&:hover': {
+            transform: 'translateY(-4px)',
+            boxShadow: '0 12px 40px rgba(102, 126, 234, 0.2)',
+          },
+        }}
+      >
+        <CardContent sx={{ p: 3 }}>
+          <Box display="flex" alignItems="center" justifyContent="space-between">
+            <Box>
+              <Typography variant="h6" color="text.secondary" gutterBottom>
+                {title}
               </Typography>
-              <Typography variant="h4">{roomCount}</Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} md={4}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                <PeopleIcon /> ผู้เช่าทั้งหมด
+              <Typography 
+                variant="h3" 
+                fontWeight="bold" 
+                sx={{ 
+                  background: gradient,
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                }}
+              >
+                {loading ? '-' : value}
               </Typography>
-              <Typography variant="h4">{tenantCount}</Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} md={4}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                <DescriptionIcon /> สัญญาเช่า
-              </Typography>
-              <Typography variant="h4">{contractCount}</Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12}>
-          <Card>
-            <CardContent>
-              <Typography variant="h5">สรุปข้อมูล</Typography>
-              <Typography variant="body1">จำนวนห้องที่มีการเช่า: {rentedCount}</Typography>
-              <Typography variant="body1" sx={{ mt: 2 }}>
-                สัญญาใกล้หมดอายุ:
-              </Typography>
-              {expiringContracts.length > 0 ? (
-                expiringContracts.map(contract => (
-                  <Typography key={contract.id} variant="body2">
-                    ห้อง {contract.room_id} หมดอายุวันที่ {dayjs(contract.end_date).format('DD/MM/YYYY')}
-                  </Typography>
-                ))
-              ) : (
-                <Typography variant="body2">ไม่มีสัญญาที่ใกล้หมดอายุ</Typography>
+              {subtitle && (
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                  {subtitle}
+                </Typography>
               )}
-            </CardContent>
-          </Card>
+            </Box>
+            <Avatar
+              sx={{
+                width: 64,
+                height: 64,
+                background: gradient,
+                boxShadow: '0 8px 25px rgba(102, 126, 234, 0.3)',
+              }}
+            >
+              {icon}
+            </Avatar>
+          </Box>
+          {loading && (
+            <LinearProgress 
+              sx={{ 
+                mt: 2, 
+                borderRadius: 2,
+                height: 4,
+                '& .MuiLinearProgress-bar': {
+                  background: gradient,
+                }
+              }} 
+            />
+          )}
+        </CardContent>
+      </Card>
+    </Grow>
+  );
+
+  return (
+    <Box sx={{ p: 3 }}>
+      {/* Header */}
+      <Fade in={true} timeout={800}>
+        <Box mb={4}>
+          <Box display="flex" alignItems="center" justifyContent="between" mb={2}>
+            <Box>
+              <Typography 
+                variant="h4" 
+                fontWeight="bold"
+                sx={{
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                }}
+              >
+                แดชบอร์ดภาพรวม
+              </Typography>
+              <Typography variant="body1" color="text.secondary" sx={{ mt: 1 }}>
+                ข้อมูลสรุปการจัดการระบบการเช่า ณ วันที่ {dayjs().format('DD/MM/YYYY')}
+              </Typography>
+            </Box>
+            <IconButton
+              onClick={() => window.location.reload()}
+              sx={{
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                color: 'white',
+                '&:hover': {
+                  background: 'linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%)',
+                  transform: 'rotate(180deg)',
+                },
+                transition: 'all 0.3s ease',
+              }}
+            >
+              <RefreshIcon />
+            </IconButton>
+          </Box>
+        </Box>
+      </Fade>
+
+      {/* Statistics Cards */}
+      <Grid container spacing={3} mb={4}>
+        <Grid item xs={12} sm={6} md={3}>
+          <StatCard
+            icon={<HomeIcon sx={{ fontSize: 28 }} />}
+            title="ห้องทั้งหมด"
+            value={roomCount}
+            subtitle={`ห้องว่าง ${roomCount - rentedCount} ห้อง`}
+            gradient="linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+            delay={0}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <StatCard
+            icon={<PeopleIcon sx={{ fontSize: 28 }} />}
+            title="ผู้เช่าทั้งหมด"
+            value={tenantCount}
+            subtitle="ผู้เช่าปัจจุบัน"
+            gradient="linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%)"
+            delay={100}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <StatCard
+            icon={<DescriptionIcon sx={{ fontSize: 28 }} />}
+            title="สัญญาเช่า"
+            value={contractCount}
+            subtitle="สัญญาทั้งหมด"
+            gradient="linear-gradient(135deg, #11998e 0%, #38ef7d 100%)"
+            delay={200}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <StatCard
+            icon={<TrendingUpIcon sx={{ fontSize: 28 }} />}
+            title="อัตราการเช่า"
+            value={`${occupancyRate}%`}
+            subtitle={`${rentedCount} จาก ${roomCount} ห้อง`}
+            gradient="linear-gradient(135deg, #fc466b 0%, #3f5efb 100%)"
+            delay={300}
+          />
         </Grid>
       </Grid>
-    </div>
+
+      {/* Detailed Information */}
+      <Grid container spacing={3}>
+        <Grid item xs={12} md={8}>
+          <Fade in={!loading} timeout={1200}>
+            <Card>
+              <CardContent sx={{ p: 3 }}>
+                <Box display="flex" alignItems="center" mb={3}>
+                  <WarningIcon 
+                    sx={{ 
+                      mr: 2, 
+                      color: '#ff6b6b',
+                      fontSize: 28 
+                    }} 
+                  />
+                  <Typography variant="h6" fontWeight="bold">
+                    สัญญาใกล้หมดอายุ (30 วันข้างหน้า)
+                  </Typography>
+                </Box>
+                
+                {expiringContracts.length === 0 ? (
+                  <Box textAlign="center" py={4}>
+                    <CheckCircleIcon 
+                      sx={{ 
+                        fontSize: 64, 
+                        color: '#4ecdc4',
+                        mb: 2
+                      }} 
+                    />
+                    <Typography variant="h6" color="text.secondary">
+                      ไม่มีสัญญาที่ใกล้หมดอายุ
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      สัญญาทั้งหมดยังมีระยะเวลาการเช่ามากกว่า 30 วัน
+                    </Typography>
+                  </Box>
+                ) : (
+                  <Box>
+                    {expiringContracts.map((contract, index) => (
+                      <Fade in={true} timeout={800} style={{ transitionDelay: `${index * 100}ms` }} key={contract.id}>
+                        <Box
+                          sx={{
+                            p: 2,
+                            mb: 2,
+                            borderRadius: 2,
+                            background: 'linear-gradient(135deg, rgba(255, 107, 107, 0.1) 0%, rgba(255, 182, 182, 0.1) 100%)',
+                            border: '1px solid rgba(255, 107, 107, 0.2)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                          }}
+                        >
+                          <Box display="flex" alignItems="center">
+                            <ScheduleIcon sx={{ mr: 2, color: '#ff6b6b' }} />
+                            <Box>
+                              <Typography variant="subtitle1" fontWeight="600">
+                                ห้อง {contract.room_id}
+                              </Typography>
+                              <Typography variant="body2" color="text.secondary">
+                                หมดอายุวันที่ {dayjs(contract.end_date).format('DD/MM/YYYY')}
+                              </Typography>
+                            </Box>
+                          </Box>
+                          <Chip
+                            label={`เหลือ ${dayjs(contract.end_date).diff(dayjs(), 'day')} วัน`}
+                            size="small"
+                            sx={{
+                              background: 'linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%)',
+                              color: 'white',
+                              fontWeight: 600,
+                            }}
+                          />
+                        </Box>
+                      </Fade>
+                    ))}
+                  </Box>
+                )}
+              </CardContent>
+            </Card>
+          </Fade>
+        </Grid>
+        
+        <Grid item xs={12} md={4}>
+          <Fade in={!loading} timeout={1400}>
+            <Card>
+              <CardContent sx={{ p: 3 }}>
+                <Typography variant="h6" fontWeight="bold" mb={3}>
+                  สถิติการเช่า
+                </Typography>
+                
+                <Box mb={3}>
+                  <Box display="flex" justifyContent="space-between" mb={1}>
+                    <Typography variant="body2" color="text.secondary">
+                      อัตราการเช่า
+                    </Typography>
+                    <Typography variant="body2" fontWeight="600">
+                      {occupancyRate}%
+                    </Typography>
+                  </Box>
+                  <LinearProgress
+                    variant="determinate"
+                    value={occupancyRate}
+                    sx={{
+                      height: 8,
+                      borderRadius: 4,
+                      backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                      '& .MuiLinearProgress-bar': {
+                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        borderRadius: 4,
+                      },
+                    }}
+                  />
+                </Box>
+
+                <Box
+                  sx={{
+                    p: 2,
+                    borderRadius: 2,
+                    background: 'linear-gradient(135deg, rgba(78, 205, 196, 0.1) 0%, rgba(68, 160, 141, 0.1) 100%)',
+                    border: '1px solid rgba(78, 205, 196, 0.2)',
+                    mb: 2,
+                  }}
+                >
+                  <Typography variant="body2" color="text.secondary" mb={1}>
+                    ห้องที่มีผู้เช่า
+                  </Typography>
+                  <Typography variant="h4" fontWeight="bold" color="#4ecdc4">
+                    {rentedCount}
+                  </Typography>
+                </Box>
+
+                <Box
+                  sx={{
+                    p: 2,
+                    borderRadius: 2,
+                    background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)',
+                    border: '1px solid rgba(102, 126, 234, 0.2)',
+                  }}
+                >
+                  <Typography variant="body2" color="text.secondary" mb={1}>
+                    ห้องว่าง
+                  </Typography>
+                  <Typography variant="h4" fontWeight="bold" color="#667eea">
+                    {roomCount - rentedCount}
+                  </Typography>
+                </Box>
+              </CardContent>
+            </Card>
+          </Fade>
+        </Grid>
+      </Grid>
+    </Box>
   );
 };
 
