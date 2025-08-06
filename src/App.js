@@ -18,7 +18,7 @@ const App = () => (
     theme={theme}
     dashboard={CustomDashboard}
     dataProvider={dataProvider}
-    authProvider={authProvider}
+    // authProvider={authProvider} // ปิดไว้ก่อน
     appBar={MyAppBar}
   >
     {/* เรียงลำดับใหม่: Contracts ก่อน Rooms */}
