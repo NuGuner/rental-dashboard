@@ -1,56 +1,25 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import ContractShow from './ContractShow';
 import LandlordList from './LandlordList';
 import LandlordCreate from './LandlordCreate';
 import LandlordEdit from './LandlordEdit';
 import LandlordShow from './LandlordShow';
 import { Admin, Resource } from 'react-admin';
-import { supabase } from './supabaseClient';
 import theme from './theme';
 import CustomDashboard from './components/CustomDashboard';
 import { RoomList, RoomEdit, RoomCreate } from './components/RoomList';
 import { TenantList, TenantEdit, TenantCreate } from './components/TenantList';
 import { ContractList, ContractEdit, ContractCreate } from './components/ContractList';
 import dataProvider from './supabaseDataProvider';
-import authProvider from './authProvider';
 import MyAppBar from './components/MyAppBar';
-import Auth from './Auth';
 
 function App() {
-  const [session, setSession] = useState(null);
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    });
-
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-
-    return () => {
-      listener.subscription.unsubscribe();
-    };
-  }, []);
-
-  if (!session) {
-    return (
-      <Auth
-        onLogin={async ({ username, password }) => {
-          await authProvider.login({ username, password });
-          const { data } = await supabase.auth.getSession();
-          setSession(data.session);
-        }}
-      />
-    );
-  }
-
   return (
     <Admin
       theme={theme}
       dashboard={CustomDashboard}
       dataProvider={dataProvider}
-      authProvider={authProvider}
+      // authProvider={authProvider} // Disabled authentication
       appBar={MyAppBar}
     >
       {/* เรียงลำดับใหม่: Contracts ก่อน Rooms */}
