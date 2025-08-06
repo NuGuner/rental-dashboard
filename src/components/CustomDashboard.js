@@ -30,6 +30,7 @@ const CustomDashboard = () => {
   const [tenantCount, setTenantCount] = useState(0);
   const [contractCount, setContractCount] = useState(0);
   const [rentedCount, setRentedCount] = useState(0);
+  const [availableCount, setAvailableCount] = useState(0);
   const [expiringContracts, setExpiringContracts] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -47,13 +48,35 @@ const CustomDashboard = () => {
         if (tenants.count) setTenantCount(tenants.count);
         if (contracts.count) setContractCount(contracts.count);
 
-        // ดึงจำนวนห้องที่มีการเช่า
+        // ดึงจำนวนห้องที่มีการเช่า - ตรวจสอบทั้ง 2 สถานะที่เป็นไปได้
         const rentedRooms = await supabase
           .from('rooms')
           .select('*')
-          .eq('status', 'มีผู้เช่า');
+          .in('status', ['มีผู้เช่า', 'เช่าแล้ว', 'ไม่ว่าง']);
+        
+        console.log('All rooms data:', rooms.data);
+        console.log('Rented rooms data:', rentedRooms.data);
         
         if (rentedRooms.data) setRentedCount(rentedRooms.data.length);
+
+        // ดึงจำนวนห้องว่าง
+        const availableRooms = await supabase
+          .from('rooms')
+          .select('*')
+          .in('status', ['ว่าง', 'พร้อมให้เช่า', 'available']);
+        
+        console.log('Available rooms data:', availableRooms.data);
+        if (availableRooms.data) setAvailableCount(availableRooms.data.length);
+
+        // Debug: แสดงสถานะของห้องทั้งหมด
+        if (rooms.data) {
+          const statusCounts = rooms.data.reduce((acc, room) => {
+            const status = room.status || 'ไม่มีสถานะ';
+            acc[status] = (acc[status] || 0) + 1;
+            return acc;
+          }, {});
+          console.log('Room status breakdown:', statusCounts);
+        }
 
         // ดึงสัญญาที่ใกล้หมดอายุ (ภายใน 30 วัน)
         const today = dayjs();
@@ -77,6 +100,7 @@ const CustomDashboard = () => {
   }, []);
 
   const occupancyRate = roomCount > 0 ? Math.round((rentedCount / roomCount) * 100) : 0;
+  const calculatedAvailable = Math.max(0, roomCount - rentedCount); // Fallback calculation
 
   const StatCard = ({ icon, title, value, subtitle, color, gradient, delay = 0 }) => (
     <Grow in={!loading} timeout={1000} style={{ transitionDelay: `${delay}ms` }}>
@@ -199,7 +223,7 @@ const CustomDashboard = () => {
             icon={<HomeIcon sx={{ fontSize: 28 }} />}
             title="ห้องทั้งหมด"
             value={roomCount}
-            subtitle={`ห้องว่าง ${roomCount - rentedCount} ห้อง`}
+            subtitle={`ห้องว่าง ${availableCount || calculatedAvailable} ห้อง`}
             gradient="linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
             delay={0}
           />
