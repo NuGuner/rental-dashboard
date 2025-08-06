@@ -123,14 +123,25 @@ const CustomDashboard = () => {
           },
         }}
       >
-        <CardContent sx={{ p: 3 }}>
-          <Box display="flex" alignItems="center" justifyContent="space-between">
-            <Box>
-              <Typography variant="h6" color="text.secondary" gutterBottom>
+        <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+          <Box 
+            display="flex" 
+            alignItems="center" 
+            justifyContent="space-between"
+            flexDirection={{ xs: 'column', sm: 'row' }}
+            textAlign={{ xs: 'center', sm: 'left' }}
+            gap={{ xs: 2, sm: 0 }}
+          >
+            <Box sx={{ order: { xs: 2, sm: 1 } }}>
+              <Typography 
+                variant={{ xs: 'subtitle2', sm: 'h6' }}
+                color="text.secondary" 
+                gutterBottom
+              >
                 {title}
               </Typography>
               <Typography 
-                variant="h3" 
+                variant={{ xs: 'h4', sm: 'h3' }}
                 fontWeight="bold" 
                 sx={{ 
                   background: gradient,
@@ -142,20 +153,29 @@ const CustomDashboard = () => {
                 {loading ? '-' : value}
               </Typography>
               {subtitle && (
-                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                <Typography 
+                  variant={{ xs: 'caption', sm: 'body2' }}
+                  color="text.secondary" 
+                  sx={{ mt: 1 }}
+                >
                   {subtitle}
                 </Typography>
               )}
             </Box>
             <Avatar
               sx={{
-                width: 64,
-                height: 64,
+                width: { xs: 48, sm: 56, md: 64 },
+                height: { xs: 48, sm: 56, md: 64 },
                 background: gradient,
                 boxShadow: '0 8px 25px rgba(102, 126, 234, 0.3)',
+                order: { xs: 1, sm: 2 }
               }}
             >
-              {icon}
+              {React.cloneElement(icon, { 
+                sx: { 
+                  fontSize: { xs: 20, sm: 24, md: 28 }
+                } 
+              })}
             </Avatar>
           </Box>
           {loading && (
@@ -176,14 +196,25 @@ const CustomDashboard = () => {
   );
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ 
+      p: { xs: 2, sm: 3 }, // Responsive padding: smaller on mobile
+      maxWidth: '100%',
+      overflow: 'hidden'
+    }}>
       {/* Header */}
       <Fade in={true} timeout={800}>
-        <Box mb={4}>
-          <Box display="flex" alignItems="center" justifyContent="between" mb={2}>
+        <Box mb={{ xs: 3, md: 4 }}>
+          <Box 
+            display="flex" 
+            alignItems={{ xs: 'flex-start', sm: 'center' }}
+            justifyContent="space-between" 
+            mb={2}
+            flexDirection={{ xs: 'column', sm: 'row' }}
+            gap={{ xs: 2, sm: 0 }}
+          >
             <Box>
               <Typography 
-                variant="h4" 
+                variant={{ xs: 'h5', sm: 'h4' }} // Smaller heading on mobile
                 fontWeight="bold"
                 sx={{
                   background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
@@ -194,7 +225,11 @@ const CustomDashboard = () => {
               >
                 แดชบอร์ดภาพรวม
               </Typography>
-              <Typography variant="body1" color="text.secondary" sx={{ mt: 1 }}>
+              <Typography 
+                variant={{ xs: 'body2', sm: 'body1' }} 
+                color="text.secondary" 
+                sx={{ mt: 1 }}
+              >
                 ข้อมูลสรุปการจัดการระบบการเช่า ณ วันที่ {dayjs().format('DD/MM/YYYY')}
               </Typography>
             </Box>
@@ -203,6 +238,7 @@ const CustomDashboard = () => {
               sx={{
                 background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                 color: 'white',
+                alignSelf: { xs: 'flex-end', sm: 'center' },
                 '&:hover': {
                   background: 'linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%)',
                   transform: 'rotate(180deg)',
@@ -217,8 +253,8 @@ const CustomDashboard = () => {
       </Fade>
 
       {/* Statistics Cards */}
-      <Grid container spacing={3} mb={4}>
-        <Grid item xs={12} sm={6} md={3}>
+      <Grid container spacing={{ xs: 2, sm: 3 }} mb={{ xs: 3, md: 4 }}>
+        <Grid item xs={6} sm={6} md={3}>
           <StatCard
             icon={<HomeIcon sx={{ fontSize: 28 }} />}
             title="ห้องทั้งหมด"
@@ -228,7 +264,7 @@ const CustomDashboard = () => {
             delay={0}
           />
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid item xs={6} sm={6} md={3}>
           <StatCard
             icon={<PeopleIcon sx={{ fontSize: 28 }} />}
             title="ผู้เช่าทั้งหมด"
@@ -238,7 +274,7 @@ const CustomDashboard = () => {
             delay={100}
           />
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid item xs={6} sm={6} md={3}>
           <StatCard
             icon={<DescriptionIcon sx={{ fontSize: 28 }} />}
             title="สัญญาเช่า"
@@ -248,7 +284,7 @@ const CustomDashboard = () => {
             delay={200}
           />
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid item xs={6} sm={6} md={3}>
           <StatCard
             icon={<TrendingUpIcon sx={{ fontSize: 28 }} />}
             title="อัตราการเช่า"
@@ -261,37 +297,46 @@ const CustomDashboard = () => {
       </Grid>
 
       {/* Detailed Information */}
-      <Grid container spacing={3}>
-        <Grid item xs={12} md={8}>
+      <Grid container spacing={{ xs: 2, sm: 3 }}>
+        <Grid item xs={12} lg={8}>
           <Fade in={!loading} timeout={1200}>
             <Card>
-              <CardContent sx={{ p: 3 }}>
+              <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
                 <Box display="flex" alignItems="center" mb={3}>
                   <WarningIcon 
                     sx={{ 
                       mr: 2, 
                       color: '#ff6b6b',
-                      fontSize: 28 
+                      fontSize: { xs: 24, sm: 28 }
                     }} 
                   />
-                  <Typography variant="h6" fontWeight="bold">
+                  <Typography 
+                    variant={{ xs: 'subtitle1', sm: 'h6' }}
+                    fontWeight="bold"
+                  >
                     สัญญาใกล้หมดอายุ (30 วันข้างหน้า)
                   </Typography>
                 </Box>
                 
                 {expiringContracts.length === 0 ? (
-                  <Box textAlign="center" py={4}>
+                  <Box textAlign="center" py={{ xs: 3, sm: 4 }}>
                     <CheckCircleIcon 
                       sx={{ 
-                        fontSize: 64, 
+                        fontSize: { xs: 48, sm: 64 }, 
                         color: '#4ecdc4',
                         mb: 2
                       }} 
                     />
-                    <Typography variant="h6" color="text.secondary">
+                    <Typography 
+                      variant={{ xs: 'subtitle1', sm: 'h6' }}
+                      color="text.secondary"
+                    >
                       ไม่มีสัญญาที่ใกล้หมดอายุ
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography 
+                      variant={{ xs: 'caption', sm: 'body2' }}
+                      color="text.secondary"
+                    >
                       สัญญาทั้งหมดยังมีระยะเวลาการเช่ามากกว่า 30 วัน
                     </Typography>
                   </Box>
@@ -301,7 +346,7 @@ const CustomDashboard = () => {
                       <Fade in={true} timeout={800} style={{ transitionDelay: `${index * 100}ms` }} key={contract.id}>
                         <Box
                           sx={{
-                            p: 2,
+                            p: { xs: 1.5, sm: 2 },
                             mb: 2,
                             borderRadius: 2,
                             background: 'linear-gradient(135deg, rgba(255, 107, 107, 0.1) 0%, rgba(255, 182, 182, 0.1) 100%)',
@@ -309,26 +354,40 @@ const CustomDashboard = () => {
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'space-between',
+                            flexDirection: { xs: 'column', sm: 'row' },
+                            gap: { xs: 1, sm: 0 }
                           }}
                         >
-                          <Box display="flex" alignItems="center">
-                            <ScheduleIcon sx={{ mr: 2, color: '#ff6b6b' }} />
-                            <Box>
-                              <Typography variant="subtitle1" fontWeight="600">
+                          <Box 
+                            display="flex" 
+                            alignItems="center"
+                            justifyContent={{ xs: 'center', sm: 'flex-start' }}
+                            width={{ xs: '100%', sm: 'auto' }}
+                          >
+                            <ScheduleIcon sx={{ mr: 2, color: '#ff6b6b', fontSize: { xs: 20, sm: 24 } }} />
+                            <Box textAlign={{ xs: 'center', sm: 'left' }}>
+                              <Typography 
+                                variant={{ xs: 'body1', sm: 'subtitle1' }}
+                                fontWeight="600"
+                              >
                                 ห้อง {contract.room_id}
                               </Typography>
-                              <Typography variant="body2" color="text.secondary">
+                              <Typography 
+                                variant={{ xs: 'caption', sm: 'body2' }}
+                                color="text.secondary"
+                              >
                                 หมดอายุวันที่ {dayjs(contract.end_date).format('DD/MM/YYYY')}
                               </Typography>
                             </Box>
                           </Box>
                           <Chip
                             label={`เหลือ ${dayjs(contract.end_date).diff(dayjs(), 'day')} วัน`}
-                            size="small"
+                            size={{ xs: 'small', sm: 'medium' }}
                             sx={{
                               background: 'linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%)',
                               color: 'white',
                               fontWeight: 600,
+                              fontSize: { xs: '0.75rem', sm: '0.875rem' }
                             }}
                           />
                         </Box>
@@ -341,11 +400,15 @@ const CustomDashboard = () => {
           </Fade>
         </Grid>
         
-        <Grid item xs={12} md={4}>
+        <Grid item xs={12} lg={4}>
           <Fade in={!loading} timeout={1400}>
             <Card>
-              <CardContent sx={{ p: 3 }}>
-                <Typography variant="h6" fontWeight="bold" mb={3}>
+              <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+                <Typography 
+                  variant={{ xs: 'subtitle1', sm: 'h6' }}
+                  fontWeight="bold" 
+                  mb={3}
+                >
                   สถิติการเช่า
                 </Typography>
                 
@@ -385,7 +448,11 @@ const CustomDashboard = () => {
                   <Typography variant="body2" color="text.secondary" mb={1}>
                     ห้องที่มีผู้เช่า
                   </Typography>
-                  <Typography variant="h4" fontWeight="bold" color="#4ecdc4">
+                  <Typography 
+                    variant={{ xs: 'h5', sm: 'h4' }}
+                    fontWeight="bold" 
+                    color="#4ecdc4"
+                  >
                     {rentedCount}
                   </Typography>
                 </Box>

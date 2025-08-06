@@ -105,18 +105,36 @@ const MyAppBar = (props) => {
   return (
     <AppBar {...props} userMenu={<MyUserMenu />}>
       <Typography
-        variant="h6"
+        variant={{ xs: 'subtitle1', sm: 'h6' }}
         color="inherit"
-        sx={{ flex: 1, textAlign: 'left', paddingLeft: 2 }}
+        sx={{ 
+          flex: 1, 
+          textAlign: 'left', 
+          paddingLeft: { xs: 1, sm: 2 },
+          fontSize: { xs: '1rem', sm: '1.25rem' }
+        }}
         id="react-admin-title"
       >
-        ระบบจัดการการเช่า
+        <Box sx={{ display: { xs: 'none', sm: 'block' } }}>ระบบจัดการการเช่า</Box>
+        <Box sx={{ display: { xs: 'block', sm: 'none' } }}>จัดการเช่า</Box>
       </Typography>
       
       {/* Show current user and role in app bar */}
       {identity && (
-        <Box display="flex" alignItems="center" mr={2}>
-          <Typography variant="body2" color="inherit" sx={{ mr: 1 }}>
+        <Box 
+          display="flex" 
+          alignItems="center" 
+          mr={{ xs: 1, sm: 2 }}
+          gap={{ xs: 0.5, sm: 1 }}
+        >
+          <Typography 
+            variant={{ xs: 'caption', sm: 'body2' }}
+            color="inherit" 
+            sx={{ 
+              mr: 1,
+              display: { xs: 'none', md: 'block' }
+            }}
+          >
             สวัสดี, {identity.fullName}
           </Typography>
           <Chip
@@ -126,7 +144,8 @@ const MyAppBar = (props) => {
             sx={{ 
               backgroundColor: identity.role === 'admin' ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.1)',
               color: 'white',
-              fontWeight: 'bold'
+              fontWeight: 'bold',
+              fontSize: { xs: '0.7rem', sm: '0.75rem' }
             }}
           />
         </Box>

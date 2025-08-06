@@ -21,10 +21,29 @@ import {
   SimpleShowLayout,
 } from 'react-admin';
 
-// Simple List Component
+// Simple List Component - Responsive
 export const ContractsList = () => (
   <List>
-    <Datagrid rowClick="edit">
+    <Datagrid 
+      rowClick="edit"
+      sx={{
+        '& .MuiTableContainer-root': {
+          overflowX: 'auto',
+        },
+        '& .MuiTableCell-root': {
+          whiteSpace: 'nowrap',
+          '&:first-of-type': {
+            position: 'sticky',
+            left: 0,
+            backgroundColor: 'background.paper',
+            zIndex: 1,
+          }
+        },
+        '& .MuiTableRow-root:hover .MuiTableCell-root:first-of-type': {
+          backgroundColor: 'action.hover',
+        }
+      }}
+    >
       <TextField source="id" label="รหัสสัญญา" />
       <ReferenceField source="room_id" reference="rooms" label="ห้อง">
         <TextField source="room_name" />
@@ -32,12 +51,25 @@ export const ContractsList = () => (
       <ReferenceField source="tenant_id" reference="tenants" label="ผู้เช่า">
         <TextField source="full_name" />
       </ReferenceField>
-      <ReferenceField source="landlord_id" reference="landlords" label="เจ้าของ">
+      <ReferenceField 
+        source="landlord_id" 
+        reference="landlords" 
+        label="เจ้าของ"
+        sx={{ display: { xs: 'none', md: 'table-cell' } }}
+      >
         <TextField source="full_name" />
       </ReferenceField>
-      <DateField source="start_date" label="วันเริ่มสัญญา" />
+      <DateField 
+        source="start_date" 
+        label="วันเริ่มสัญญา"
+        sx={{ display: { xs: 'none', sm: 'table-cell' } }}
+      />
       <DateField source="end_date" label="วันหมดสัญญา" />
-      <NumberField source="contract_duration" label="ระยะเวลา (เดือน)" />
+      <NumberField 
+        source="contract_duration" 
+        label="ระยะเวลา (เดือน)"
+        sx={{ display: { xs: 'none', lg: 'table-cell' } }}
+      />
       <TextField source="status" label="สถานะ" />
       <EditButton />
       <DeleteButton />
