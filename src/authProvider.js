@@ -1,6 +1,6 @@
 import { supabase } from './supabaseClient';
 
-const allowedUsers = ['admin@example.com', 'manager@example.com'];
+const allowedUsers = ['panutorn.gmail.com', 'magic_oil@hotmail.com'];
 
 let currentUser = null; // เก็บข้อมูลผู้ใช้ไว้ใน memory
 
