@@ -494,7 +494,7 @@ export const ContractCreate = () => (
         />
         <TextInput 
           source="status" 
-          label="สัญญา" 
+          label="สถานะสัญญา" 
           validate={[required()]}
           defaultValue="ใช้งาน"
           sx={{

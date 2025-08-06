@@ -4,7 +4,7 @@ const ContractShow = () => (
   <Show>
     <SimpleShowLayout>
       <TextField source="id" />
-      <ReferenceField source="room_id" reference="rooms"><TextField source="name" /></ReferenceField>
+      <ReferenceField source="room_id" reference="rooms"><TextField source="room_name" /></ReferenceField>
       <ReferenceField source="tenant_id" reference="tenants"><TextField source="full_name" /></ReferenceField>
       <ReferenceField source="landlord_id" reference="landlords"><TextField source="full_name" /></ReferenceField>
       <DateField source="start_date" />

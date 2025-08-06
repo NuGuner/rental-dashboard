@@ -25,7 +25,10 @@ const supabaseDataProvider = {
     }
 
     const { data, error, count } = await query;
-    if (error) throw new Error(error.message);
+    if (error) {
+      console.error('Supabase getList error:', error);
+      throw new Error(error.message);
+    }
     return {
       data: data.map(item => ({ ...item, id: item.id })),
       total: count,
@@ -38,7 +41,10 @@ const supabaseDataProvider = {
       .select('*')
       .eq('id', params.id)
       .single();
-    if (error) throw new Error(error.message);
+    if (error) {
+      console.error('Supabase getOne error:', error);
+      throw new Error(error.message);
+    }
     return { data };
   },
 
@@ -48,7 +54,10 @@ const supabaseDataProvider = {
       .from(resource)
       .select('*')
       .in('id', ids);
-    if (error) throw new Error(error.message);
+    if (error) {
+      console.error('Supabase getMany error:', error);
+      throw new Error(error.message);
+    }
     return { data };
   },
 
