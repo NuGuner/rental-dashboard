@@ -244,7 +244,7 @@ export const ContractList = () => (
           },
         }}
       >
-        <ContractIdField source="id" label="รหัสสัญญา" />
+        <TextField source="id" label="รหัสสัญญา" />
         <ReferenceField source="room_id" reference="rooms" label="ห้อง">
           <TextField 
             source="room_name"
@@ -297,7 +297,7 @@ export const ContractList = () => (
             fontWeight: 600,
           }}
         />
-        <StatusChip source="status" label="สถานะสัญญา" />
+        <TextField source="status" label="สถานะสัญญา" />
         <ModernListActions />
       </Datagrid>
     </List>

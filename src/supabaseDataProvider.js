@@ -29,6 +29,7 @@ const supabaseDataProvider = {
       console.error('Supabase getList error:', error);
       throw new Error(error.message);
     }
+    console.log(`getList ${resource}:`, data);
     return {
       data: data.map(item => ({ ...item, id: item.id })),
       total: count,
