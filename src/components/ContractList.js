@@ -20,6 +20,7 @@ import {
   SelectInput,
   required,
   usePermissions,
+  useRecordContext,
 } from 'react-admin';
 import {
   Box,
@@ -103,7 +104,10 @@ const ModernListActions = ({ record, basePath }) => {
   );
 };
 
-const StatusChip = ({ record }) => {
+const StatusChip = () => {
+  const record = useRecordContext();
+  if (!record) return null;
+  
   const getStatusColor = (status) => {
     switch (status) {
       case 'ใช้งาน':
@@ -131,29 +135,34 @@ const StatusChip = ({ record }) => {
   );
 };
 
-const ContractIdField = ({ record }) => (
-  <Box display="flex" alignItems="center">
-    <Avatar
-      sx={{
-        width: 32,
-        height: 32,
-        mr: 2,
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        fontSize: '0.875rem'
-      }}
-    >
-      <ContractIcon fontSize="small" />
-    </Avatar>
-    <Box>
-      <Typography variant="subtitle2" fontWeight="600">
-        #{record.id}
-      </Typography>
-      <Typography variant="caption" color="text.secondary">
-        สัญญาเช่า
-      </Typography>
+const ContractIdField = () => {
+  const record = useRecordContext();
+  if (!record) return null;
+  
+  return (
+    <Box display="flex" alignItems="center">
+      <Avatar
+        sx={{
+          width: 32,
+          height: 32,
+          mr: 2,
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          fontSize: '0.875rem'
+        }}
+      >
+        <ContractIcon fontSize="small" />
+      </Avatar>
+      <Box>
+        <Typography variant="subtitle2" fontWeight="600">
+          #{record.id}
+        </Typography>
+        <Typography variant="caption" color="text.secondary">
+          สัญญาเช่า
+        </Typography>
+      </Box>
     </Box>
-  </Box>
-);
+  );
+};
 
 export const ContractList = () => (
   <div>
@@ -235,11 +244,7 @@ export const ContractList = () => (
           },
         }}
       >
-        <TextField 
-          source="id" 
-          label="รหัสสัญญา"
-          component={ContractIdField}
-        />
+        <ContractIdField source="id" label="รหัสสัญญา" />
         <ReferenceField source="room_id" reference="rooms" label="ห้อง">
           <TextField 
             source="room_name"
@@ -292,11 +297,7 @@ export const ContractList = () => (
             fontWeight: 600,
           }}
         />
-        <TextField 
-          source="status" 
-          label="สถานะสัญญา"
-          component={StatusChip}
-        />
+        <StatusChip source="status" label="สถานะสัญญา" />
         <ModernListActions />
       </Datagrid>
     </List>
