@@ -1,7 +1,11 @@
 import { supabase } from './supabaseClient';
 
-// อีเมลที่ได้รับอนุญาตให้เข้าใช้งาน
-const allowedUsers = ['panutorn@gmail.com', 'magic_oil@hotmail.com'];
+// อีเมลที่ได้รับอนุญาตให้เข้าใช้งาน พร้อมสิทธิ์
+const allowedUsers = {
+  'panutorn@gmail.com': 'admin',      // ผู้ดูแลระบบ
+  'magic_oil@hotmail.com': 'admin',   // ผู้ดูแลระบบ
+  // เพิ่มผู้ใช้ใหม่ที่นี่ - 'email@example.com': 'viewer'
+};
 
 let currentUser = null; // เก็บข้อมูลผู้ใช้ไว้ใน memory
 
@@ -18,16 +22,30 @@ const authProvider = {
         if (error.message.includes('Invalid login credentials')) {
           throw new Error('อีเมลหรือรหัสผ่านไม่ถูกต้อง');
         }
+        if (error.message.includes('Email not confirmed')) {
+          throw new Error('กรุณายืนยันอีเมลก่อนเข้าสู่ระบบ');
+        }
         throw new Error(error.message);
       }
 
       // Check if user is in allowed list
-      if (!allowedUsers.includes(username)) {
+      if (!allowedUsers[username]) {
         await supabase.auth.signOut();
         throw new Error('บัญชีนี้ไม่ได้รับอนุญาตให้เข้าใช้งาน กรุณาติดต่อผู้ดูแลระบบ');
       }
 
-      currentUser = data?.user || null; // เก็บข้อมูลผู้ใช้
+      // Set user role from allowed users
+      const userRole = allowedUsers[username];
+      currentUser = {
+        ...data?.user,
+        role: userRole
+      };
+
+      // Update user metadata in Supabase
+      await supabase.auth.updateUser({
+        data: { role: userRole }
+      });
+
       return Promise.resolve();
     } catch (error) {
       throw error;
@@ -46,7 +64,7 @@ const authProvider = {
     
     // Double-check if user is still allowed
     const userEmail = data.session.user?.email;
-    if (userEmail && !allowedUsers.includes(userEmail)) {
+    if (userEmail && !allowedUsers[userEmail]) {
       await supabase.auth.signOut();
       throw new Error('บัญชีไม่ได้รับอนุญาต');
     }
@@ -61,7 +79,19 @@ const authProvider = {
     return Promise.resolve();
   },
 
-  getPermissions: () => Promise.resolve('admin'), // You can implement roles later
+  getPermissions: async () => {
+    if (currentUser?.role) {
+      return Promise.resolve(currentUser.role);
+    }
+
+    const { data } = await supabase.auth.getUser();
+    if (data?.user?.email) {
+      const role = allowedUsers[data.user.email] || 'viewer';
+      return Promise.resolve(role);
+    }
+    
+    return Promise.resolve('viewer'); // Default to viewer
+  },
 
   getIdentity: async () => {
     if (currentUser) {
@@ -69,20 +99,45 @@ const authProvider = {
         id: currentUser.id,
         fullName: currentUser.email?.split('@')[0] || 'ผู้ดูแลระบบ',
         email: currentUser.email,
+        role: currentUser.role || 'viewer',
+        avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.email?.split('@')[0] || 'User')}&background=1976d2&color=fff`
       });
     }
 
     const { data, error } = await supabase.auth.getUser();
     if (error || !data?.user) return null;
     
-    currentUser = data.user; // Update currentUser
+    const userRole = allowedUsers[data.user.email] || 'viewer';
+    currentUser = {
+      ...data.user,
+      role: userRole
+    };
     
     return {
       id: data.user.id,
       fullName: data.user.email?.split('@')[0] || 'ผู้ดูแลระบบ',
       email: data.user.email,
+      role: userRole,
+      avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(data.user.email?.split('@')[0] || 'User')}&background=1976d2&color=fff`
     };
   },
+
+  // Custom method to check if user has specific permission
+  hasPermission: async (action) => {
+    const permissions = await authProvider.getPermissions();
+    
+    const rolePermissions = {
+      admin: ['create', 'read', 'update', 'delete', 'manage_users', 'view_reports'],
+      viewer: ['read']
+    };
+
+    return rolePermissions[permissions]?.includes(action) || false;
+  },
+
+  // Custom method to get user role
+  getUserRole: () => {
+    return currentUser?.role || 'viewer';
+  }
 };
 
 export default authProvider;

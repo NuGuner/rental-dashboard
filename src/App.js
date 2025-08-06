@@ -11,6 +11,7 @@ import CustomDashboard from './components/CustomDashboard';
 import { RoomList, RoomEdit, RoomCreate } from './components/RoomList';
 import { TenantList, TenantEdit, TenantCreate } from './components/TenantList';
 import { ContractList, ContractEdit, ContractCreate } from './components/ContractList';
+import UserManagement from './components/UserManagement';
 import dataProvider from './supabaseDataProvider';
 import authProvider from './authProvider';
 import MyAppBar from './components/MyAppBar';
@@ -84,18 +85,21 @@ function App() {
         create={ContractCreate}
         edit={ContractEdit}
         show={ContractShow}
+        options={{ label: 'สัญญาเช่า' }}
       />
       <Resource
         name="rooms"
         list={RoomList}
         edit={RoomEdit}
         create={RoomCreate}
+        options={{ label: 'ห้องเช่า' }}
       />
       <Resource
         name="tenants"
         list={TenantList}
         edit={TenantEdit}
         create={TenantCreate}
+        options={{ label: 'ผู้เช่า' }}
       />
       <Resource
         name="landlords"
@@ -103,6 +107,13 @@ function App() {
         create={LandlordCreate}
         edit={LandlordEdit}
         show={LandlordShow}
+        options={{ label: 'เจ้าของ' }}
+      />
+      {/* User Management - Admin Only */}
+      <Resource
+        name="users"
+        list={UserManagement}
+        options={{ label: 'จัดการผู้ใช้' }}
       />
     </Admin>
   );
