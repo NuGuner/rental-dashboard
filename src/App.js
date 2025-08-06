@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import ContractShow from './ContractShow';
+// import ContractShow from './ContractShow'; // Replaced with new ContractsPage
 import LandlordList from './LandlordList';
 import LandlordCreate from './LandlordCreate';
 import LandlordEdit from './LandlordEdit';
@@ -10,7 +10,7 @@ import theme from './theme';
 import CustomDashboard from './components/CustomDashboard';
 import { RoomList, RoomEdit, RoomCreate } from './components/RoomList';
 import { TenantList, TenantEdit, TenantCreate } from './components/TenantList';
-import { ContractList, ContractEdit, ContractCreate } from './components/ContractList';
+import { ContractsList, ContractsEdit, ContractsCreate, ContractsShow } from './components/ContractsPage';
 import UserManagement from './components/UserManagement';
 import dataProvider from './supabaseDataProvider';
 import authProvider from './authProvider';
@@ -81,10 +81,10 @@ function App() {
       {/* เรียงลำดับใหม่: Contracts ก่อน Rooms */}
       <Resource
         name="contracts"
-        list={ContractList}
-        create={ContractCreate}
-        edit={ContractEdit}
-        show={ContractShow}
+        list={ContractsList}
+        create={ContractsCreate}
+        edit={ContractsEdit}
+        show={ContractsShow}
         options={{ label: 'สัญญาเช่า' }}
       />
       <Resource
