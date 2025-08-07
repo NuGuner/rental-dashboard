@@ -16,17 +16,6 @@ import {
   required,
 } from 'react-admin';
 
-// Custom Status Field Component
-const StatusField = ({ record }) => {
-  const statusMap = {
-    'available': 'ว่าง',
-    'rented': 'เช่าแล้ว',
-    'maintenance': 'กำลังซ่อม'
-  };
-  
-  return <span>{statusMap[record.status] || record.status}</span>;
-};
-
 export const RoomList = () => (
   <List>
     <Datagrid rowClick="edit">
@@ -35,7 +24,18 @@ export const RoomList = () => (
       <TextField source="location" label="ที่ตั้ง" />
       <NumberField source="size" label="ขนาด (ตร.ม.)" />
       <NumberField source="monthly_rent" label="ราคาเช่าต่อเดือน" />
-      <StatusField source="status" label="สถานะ" />
+      <TextField 
+        source="status" 
+        label="สถานะ" 
+        render={(record) => {
+          const statusMap = {
+            'available': 'ว่าง',
+            'rented': 'เช่าแล้ว',
+            'maintenance': 'กำลังซ่อม'
+          };
+          return statusMap[record.status] || record.status || '-';
+        }}
+      />
       <EditButton />
       <DeleteButton />
     </Datagrid>
