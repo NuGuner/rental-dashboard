@@ -12,8 +12,20 @@ import {
   TextInput,
   NumberInput,
   Create,
+  SelectInput,
   required,
 } from 'react-admin';
+
+// Custom Status Field Component
+const StatusField = ({ record }) => {
+  const statusMap = {
+    'available': 'ว่าง',
+    'rented': 'เช่าแล้ว',
+    'maintenance': 'กำลังซ่อม'
+  };
+  
+  return <span>{statusMap[record.status] || record.status}</span>;
+};
 
 export const RoomList = () => (
   <List>
@@ -23,7 +35,7 @@ export const RoomList = () => (
       <TextField source="location" label="ที่ตั้ง" />
       <NumberField source="size" label="ขนาด (ตร.ม.)" />
       <NumberField source="monthly_rent" label="ราคาเช่าต่อเดือน" />
-      <TextField source="status" label="สถานะ" />
+      <StatusField source="status" label="สถานะ" />
       <EditButton />
       <DeleteButton />
     </Datagrid>
@@ -57,11 +69,16 @@ export const RoomEdit = () => (
         validate={[required()]} 
         helperText="กรุณากรอกราคาเช่าต่อเดือน เช่น 8000 หรือ 12000"
       />
-      <TextInput 
+      <SelectInput 
         source="status" 
         label="สถานะ" 
         validate={[required()]} 
-        helperText="กรุณากรอกสถานะห้อง เช่น ว่าง, เช่าแล้ว, กำลังซ่อม"
+        choices={[
+          { id: 'available', name: 'Available' },
+          { id: 'rented', name: 'Rented' },
+          { id: 'maintenance', name: 'Maintenance' },
+        ]}
+        helperText="เลือกสถานะของห้อง"
       />
     </SimpleForm>
   </Edit>
@@ -94,11 +111,17 @@ export const RoomCreate = () => (
         validate={[required()]} 
         helperText="กรุณากรอกราคาเช่าต่อเดือน เช่น 8000 หรือ 12000"
       />
-      <TextInput 
+      <SelectInput 
         source="status" 
         label="สถานะ" 
         validate={[required()]} 
-        helperText="กรุณากรอกสถานะห้อง เช่น ว่าง, เช่าแล้ว, กำลังซ่อม"
+        choices={[
+          { id: 'available', name: 'Available' },
+          { id: 'rented', name: 'Rented' },
+          { id: 'maintenance', name: 'Maintenance' },
+        ]}
+        defaultValue="available"
+        helperText="เลือกสถานะของห้อง"
       />
     </SimpleForm>
   </Create>
