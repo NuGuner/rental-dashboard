@@ -82,18 +82,50 @@ export const ContractsEdit = () => (
   <Edit>
     <SimpleForm>
       <ReferenceInput source="room_id" reference="rooms" label="ห้อง">
-        <SelectInput optionText="room_name" validate={[required()]} />
+        <SelectInput 
+          optionText="room_name" 
+          validate={[required()]} 
+          helperText="เลือกห้องที่ต้องการทำสัญญาเช่า"
+        />
       </ReferenceInput>
       <ReferenceInput source="tenant_id" reference="tenants" label="ผู้เช่า">
-        <SelectInput optionText="full_name" validate={[required()]} />
+        <SelectInput 
+          optionText="full_name" 
+          validate={[required()]} 
+          helperText="เลือกผู้เช่าที่จะทำสัญญา"
+        />
       </ReferenceInput>
       <ReferenceInput source="landlord_id" reference="landlords" label="เจ้าของ">
-        <SelectInput optionText="full_name" validate={[required()]} />
+        <SelectInput 
+          optionText="full_name" 
+          validate={[required()]} 
+          helperText="เลือกเจ้าของห้อง"
+        />
       </ReferenceInput>
-      <DateInput source="start_date" label="วันเริ่มสัญญา" validate={[required()]} />
-      <DateInput source="end_date" label="วันหมดสัญญา" validate={[required()]} />
-      <NumberInput source="contract_duration" label="ระยะเวลา (เดือน)" validate={[required()]} />
-      <TextInput source="status" label="สถานะ" validate={[required()]} />
+      <DateInput 
+        source="start_date" 
+        label="วันเริ่มสัญญา" 
+        validate={[required()]} 
+        helperText="เลือกวันที่เริ่มต้นสัญญาเช่า"
+      />
+      <DateInput 
+        source="end_date" 
+        label="วันหมดสัญญา" 
+        validate={[required()]} 
+        helperText="เลือกวันที่สิ้นสุดสัญญาเช่า"
+      />
+      <NumberInput 
+        source="contract_duration" 
+        label="ระยะเวลา (เดือน)" 
+        validate={[required()]} 
+        helperText="กรอกระยะเวลาสัญญาเป็นเดือน เช่น 12 หรือ 24"
+      />
+      <TextInput 
+        source="status" 
+        label="สถานะ" 
+        validate={[required()]} 
+        helperText="สถานะสัญญา เช่น ใช้งาน, หมดอายุ, ยกเลิก"
+      />
     </SimpleForm>
   </Edit>
 );
@@ -103,18 +135,51 @@ export const ContractsCreate = () => (
   <Create>
     <SimpleForm>
       <ReferenceInput source="room_id" reference="rooms" label="ห้อง">
-        <SelectInput optionText="room_name" validate={[required()]} />
+        <SelectInput 
+          optionText="room_name" 
+          validate={[required()]} 
+          helperText="เลือกห้องที่ต้องการทำสัญญาเช่า"
+        />
       </ReferenceInput>
       <ReferenceInput source="tenant_id" reference="tenants" label="ผู้เช่า">
-        <SelectInput optionText="full_name" validate={[required()]} />
+        <SelectInput 
+          optionText="full_name" 
+          validate={[required()]} 
+          helperText="เลือกผู้เช่าที่จะทำสัญญา"
+        />
       </ReferenceInput>
       <ReferenceInput source="landlord_id" reference="landlords" label="เจ้าของ">
-        <SelectInput optionText="full_name" validate={[required()]} />
+        <SelectInput 
+          optionText="full_name" 
+          validate={[required()]} 
+          helperText="เลือกเจ้าของห้อง"
+        />
       </ReferenceInput>
-      <DateInput source="start_date" label="วันเริ่มสัญญา" validate={[required()]} />
-      <DateInput source="end_date" label="วันหมดสัญญา" validate={[required()]} />
-      <NumberInput source="contract_duration" label="ระยะเวลา (เดือน)" validate={[required()]} />
-      <TextInput source="status" label="สถานะ" defaultValue="ใช้งาน" validate={[required()]} />
+      <DateInput 
+        source="start_date" 
+        label="วันเริ่มสัญญา" 
+        validate={[required()]} 
+        helperText="เลือกวันที่เริ่มต้นสัญญาเช่า"
+      />
+      <DateInput 
+        source="end_date" 
+        label="วันหมดสัญญา" 
+        validate={[required()]} 
+        helperText="เลือกวันที่สิ้นสุดสัญญาเช่า"
+      />
+      <NumberInput 
+        source="contract_duration" 
+        label="ระยะเวลา (เดือน)" 
+        validate={[required()]} 
+        helperText="กรอกระยะเวลาสัญญาเป็นเดือน เช่น 12 หรือ 24"
+      />
+      <TextInput 
+        source="status" 
+        label="สถานะ" 
+        defaultValue="ใช้งาน" 
+        validate={[required()]} 
+        helperText="สถานะสัญญา เช่น ใช้งาน, หมดอายุ, ยกเลิก"
+      />
     </SimpleForm>
   </Create>
 );
