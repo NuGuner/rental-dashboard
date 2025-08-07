@@ -36,10 +36,6 @@ export const TenantEdit = () => (
       <TextInput source="phone" label="เบอร์โทร" validate={[required()]} />
       <TextInput source="email" label="อีเมล" />
       <TextInput source="address" label="ที่อยู่" validate={[required()]} />
-      <TextInput source="full_name" label="ชื่อ-นามสกุล" />
-      <TextInput source="phone" label="เบอร์โทร" />
-      <TextInput source="email" label="อีเมล" />
-      <TextInput source="address" label="ที่อยู่" />
     </SimpleForm>
   </Edit>
 );
@@ -51,10 +47,6 @@ export const TenantCreate = () => (
       <TextInput source="phone" label="เบอร์โทร" validate={[required()]} />
       <TextInput source="email" label="อีเมล" validate={[required()]} />
       <TextInput source="address" label="ที่อยู่" validate={[required()]} />
-      <TextInput source="full_name" label="ชื่อ-นามสกุล" />
-      <TextInput source="phone" label="เบอร์โทร" />
-      <TextInput source="email" label="อีเมล" />
-      <TextInput source="address" label="ที่อยู่" />
     </SimpleForm>
   </Create>
 );
