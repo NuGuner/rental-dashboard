@@ -10,7 +10,8 @@ import {
   Avatar,
   IconButton,
   Fade,
-  Grow
+  Grow,
+  Divider
 } from '@mui/material';
 import {
   Home as HomeIcon,
@@ -20,7 +21,10 @@ import {
   Warning as WarningIcon,
   CheckCircle as CheckCircleIcon,
   Schedule as ScheduleIcon,
-  Refresh as RefreshIcon
+  Refresh as RefreshIcon,
+  AttachMoney as MoneyIcon,
+  CalendarToday as CalendarIcon,
+  Assessment as AssessmentIcon
 } from '@mui/icons-material';
 import { supabase } from '../supabaseClient';
 import dayjs from 'dayjs';
@@ -33,6 +37,13 @@ const CustomDashboard = () => {
   const [availableCount, setAvailableCount] = useState(0);
   const [expiringContracts, setExpiringContracts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [rentalStats, setRentalStats] = useState({
+    monthlyIncome: 0,
+    averageRent: 0,
+    activeContracts: 0,
+    expiredContracts: 0,
+    maintenanceRooms: 0
+  });
 
   useEffect(() => {
     const fetchCounts = async () => {
@@ -52,7 +63,7 @@ const CustomDashboard = () => {
         const rentedRooms = await supabase
           .from('rooms')
           .select('*')
-          .in('status', ['มีผู้เช่า', 'เช่าแล้ว', 'ไม่ว่าง']);
+          .in('status', ['มีผู้เช่า', 'เช่าแล้ว', 'ไม่ว่าง', 'rented']);
         
         console.log('All rooms data:', rooms.data);
         console.log('Rented rooms data:', rentedRooms.data);
@@ -68,15 +79,11 @@ const CustomDashboard = () => {
         console.log('Available rooms data:', availableRooms.data);
         if (availableRooms.data) setAvailableCount(availableRooms.data.length);
 
-        // Debug: แสดงสถานะของห้องทั้งหมด
-        if (rooms.data) {
-          const statusCounts = rooms.data.reduce((acc, room) => {
-            const status = room.status || 'ไม่มีสถานะ';
-            acc[status] = (acc[status] || 0) + 1;
-            return acc;
-          }, {});
-          console.log('Room status breakdown:', statusCounts);
-        }
+        // ดึงจำนวนห้องที่กำลังซ่อม
+        const maintenanceRooms = await supabase
+          .from('rooms')
+          .select('*')
+          .in('status', ['กำลังซ่อม', 'maintenance']);
 
         // ดึงสัญญาที่ใกล้หมดอายุ (ภายใน 30 วัน)
         const today = dayjs();
@@ -89,6 +96,57 @@ const CustomDashboard = () => {
           .eq('status', 'ใช้งาน');
         
         if (expiringData.data) setExpiringContracts(expiringData.data);
+
+        // คำนวณสถิติการเช่า
+        if (rooms.data && contracts.data) {
+          let monthlyIncome = 0;
+          let totalRent = 0;
+          let activeContracts = 0;
+          let expiredContracts = 0;
+
+          // คำนวณรายได้ต่อเดือนจากห้องที่เช่า
+          rooms.data.forEach(room => {
+            if (['rented', 'เช่าแล้ว', 'มีผู้เช่า', 'ไม่ว่าง'].includes(room.status)) {
+              monthlyIncome += room.monthly_rent || 0;
+            }
+          });
+
+          // คำนวณสัญญาที่ใช้งานและหมดอายุ
+          contracts.data.forEach(contract => {
+            if (contract.status === 'ใช้งาน') {
+              activeContracts++;
+              if (dayjs(contract.end_date).isBefore(today)) {
+                expiredContracts++;
+              }
+            }
+          });
+
+          // คำนวณค่าเช่าเฉลี่ย
+          const rentedRoomsWithRent = rooms.data.filter(room => 
+            ['rented', 'เช่าแล้ว', 'มีผู้เช่า', 'ไม่ว่าง'].includes(room.status) && room.monthly_rent
+          );
+          const averageRent = rentedRoomsWithRent.length > 0 
+            ? Math.round(rentedRoomsWithRent.reduce((sum, room) => sum + room.monthly_rent, 0) / rentedRoomsWithRent.length)
+            : 0;
+
+          setRentalStats({
+            monthlyIncome,
+            averageRent,
+            activeContracts,
+            expiredContracts,
+            maintenanceRooms: maintenanceRooms.data ? maintenanceRooms.data.length : 0
+          });
+        }
+
+        // Debug: แสดงสถานะของห้องทั้งหมด
+        if (rooms.data) {
+          const statusCounts = rooms.data.reduce((acc, room) => {
+            const status = room.status || 'ไม่มีสถานะ';
+            acc[status] = (acc[status] || 0) + 1;
+            return acc;
+          }, {});
+          console.log('Room status breakdown:', statusCounts);
+        }
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
       } finally {
@@ -404,14 +462,48 @@ const CustomDashboard = () => {
           <Fade in={!loading} timeout={1400}>
             <Card>
               <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
-                <Typography 
-                  variant={{ xs: 'subtitle1', sm: 'h6' }}
-                  fontWeight="bold" 
-                  mb={3}
-                >
-                  สถิติการเช่า
-                </Typography>
+                <Box display="flex" alignItems="center" mb={3}>
+                  <AssessmentIcon 
+                    sx={{ 
+                      mr: 2, 
+                      color: '#667eea',
+                      fontSize: { xs: 24, sm: 28 }
+                    }} 
+                  />
+                  <Typography 
+                    variant={{ xs: 'subtitle1', sm: 'h6' }}
+                    fontWeight="bold"
+                  >
+                    สถิติการเช่า
+                  </Typography>
+                </Box>
                 
+                {/* รายได้ต่อเดือน */}
+                <Box
+                  sx={{
+                    p: 2,
+                    borderRadius: 2,
+                    background: 'linear-gradient(135deg, rgba(255, 193, 7, 0.1) 0%, rgba(255, 152, 0, 0.1) 100%)',
+                    border: '1px solid rgba(255, 193, 7, 0.2)',
+                    mb: 2,
+                  }}
+                >
+                  <Box display="flex" alignItems="center" mb={1}>
+                    <MoneyIcon sx={{ mr: 1, color: '#ffc107', fontSize: 20 }} />
+                    <Typography variant="body2" color="text.secondary">
+                      รายได้ต่อเดือน
+                    </Typography>
+                  </Box>
+                  <Typography 
+                    variant={{ xs: 'h5', sm: 'h4' }}
+                    fontWeight="bold" 
+                    color="#ffc107"
+                  >
+                    ฿{rentalStats.monthlyIncome.toLocaleString()}
+                  </Typography>
+                </Box>
+
+                {/* อัตราการเช่า */}
                 <Box mb={3}>
                   <Box display="flex" justifyContent="space-between" mb={1}>
                     <Typography variant="body2" color="text.secondary">
@@ -436,41 +528,76 @@ const CustomDashboard = () => {
                   />
                 </Box>
 
-                <Box
-                  sx={{
-                    p: 2,
-                    borderRadius: 2,
-                    background: 'linear-gradient(135deg, rgba(78, 205, 196, 0.1) 0%, rgba(68, 160, 141, 0.1) 100%)',
-                    border: '1px solid rgba(78, 205, 196, 0.2)',
-                    mb: 2,
-                  }}
-                >
-                  <Typography variant="body2" color="text.secondary" mb={1}>
-                    ห้องที่มีผู้เช่า
+                <Divider sx={{ my: 2 }} />
+
+                {/* สถิติรายละเอียด */}
+                <Box mb={2}>
+                  <Typography variant="body2" color="text.secondary" mb={2}>
+                    สถานะห้อง
                   </Typography>
-                  <Typography 
-                    variant={{ xs: 'h5', sm: 'h4' }}
-                    fontWeight="bold" 
-                    color="#4ecdc4"
-                  >
-                    {rentedCount}
-                  </Typography>
+                  
+                  <Box display="flex" justifyContent="space-between" mb={1}>
+                    <Typography variant="body2" color="text.secondary">
+                      ห้องที่มีผู้เช่า
+                    </Typography>
+                    <Typography variant="body2" fontWeight="600" color="#4ecdc4">
+                      {rentedCount}
+                    </Typography>
+                  </Box>
+                  
+                  <Box display="flex" justifyContent="space-between" mb={1}>
+                    <Typography variant="body2" color="text.secondary">
+                      ห้องว่าง
+                    </Typography>
+                    <Typography variant="body2" fontWeight="600" color="#667eea">
+                      {availableCount || calculatedAvailable}
+                    </Typography>
+                  </Box>
+                  
+                  <Box display="flex" justifyContent="space-between" mb={1}>
+                    <Typography variant="body2" color="text.secondary">
+                      ห้องกำลังซ่อม
+                    </Typography>
+                    <Typography variant="body2" fontWeight="600" color="#ff9800">
+                      {rentalStats.maintenanceRooms}
+                    </Typography>
+                  </Box>
                 </Box>
 
-                <Box
-                  sx={{
-                    p: 2,
-                    borderRadius: 2,
-                    background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)',
-                    border: '1px solid rgba(102, 126, 234, 0.2)',
-                  }}
-                >
-                  <Typography variant="body2" color="text.secondary" mb={1}>
-                    ห้องว่าง
+                <Divider sx={{ my: 2 }} />
+
+                {/* สถิติสัญญา */}
+                <Box>
+                  <Typography variant="body2" color="text.secondary" mb={2}>
+                    สถานะสัญญา
                   </Typography>
-                  <Typography variant="h4" fontWeight="bold" color="#667eea">
-                    {roomCount - rentedCount}
-                  </Typography>
+                  
+                  <Box display="flex" justifyContent="space-between" mb={1}>
+                    <Typography variant="body2" color="text.secondary">
+                      สัญญาที่ใช้งาน
+                    </Typography>
+                    <Typography variant="body2" fontWeight="600" color="#4caf50">
+                      {rentalStats.activeContracts}
+                    </Typography>
+                  </Box>
+                  
+                  <Box display="flex" justifyContent="space-between" mb={1}>
+                    <Typography variant="body2" color="text.secondary">
+                      สัญญาหมดอายุ
+                    </Typography>
+                    <Typography variant="body2" fontWeight="600" color="#f44336">
+                      {rentalStats.expiredContracts}
+                    </Typography>
+                  </Box>
+                  
+                  <Box display="flex" justifyContent="space-between" mb={1}>
+                    <Typography variant="body2" color="text.secondary">
+                      ค่าเช่าเฉลี่ย
+                    </Typography>
+                    <Typography variant="body2" fontWeight="600" color="#9c27b0">
+                      ฿{rentalStats.averageRent.toLocaleString()}
+                    </Typography>
+                  </Box>
                 </Box>
               </CardContent>
             </Card>
