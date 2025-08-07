@@ -18,11 +18,10 @@ export const TenantList = () => (
   <List>
     <Datagrid rowClick="edit">
       <TextField source="id" label="รหัสผู้เช่า" />
-      <TextField source="id" />
       <TextField source="full_name" label="ชื่อ-นามสกุล" />
       <TextField source="phone" label="เบอร์โทร" />
       <EmailField source="email" label="อีเมล" />
-      <TextField source="address" label="ที่อยู่" />
+      <TextField source="id_card_number" label="เลขบัตรประชาชน" />
       <EditButton />
       <DeleteButton />
     </Datagrid>
@@ -50,10 +49,9 @@ export const TenantEdit = () => (
         helperText="กรุณากรอกอีเมลที่ใช้งานได้ เช่น somchai@example.com"
       />
       <TextInput 
-        source="address" 
-        label="ที่อยู่" 
-        validate={[required()]} 
-        helperText="กรุณากรอกที่อยู่ปัจจุบัน เช่น 123 ถนนสุขุมวิท แขวงคลองเตย เขตคลองเตย กรุงเทพฯ 10110"
+        source="id_card_number" 
+        label="เลขบัตรประชาชน" 
+        helperText="กรุณากรอกเลขบัตรประชาชน 13 หลัก เช่น 1234567890123"
       />
     </SimpleForm>
   </Edit>
@@ -81,10 +79,9 @@ export const TenantCreate = () => (
         helperText="กรุณากรอกอีเมลที่ใช้งานได้ เช่น somchai@example.com"
       />
       <TextInput 
-        source="address" 
-        label="ที่อยู่" 
-        validate={[required()]} 
-        helperText="กรุณากรอกที่อยู่ปัจจุบัน เช่น 123 ถนนสุขุมวิท แขวงคลองเตย เขตคลองเตย กรุงเทพฯ 10110"
+        source="id_card_number" 
+        label="เลขบัตรประชาชน" 
+        helperText="กรุณากรอกเลขบัตรประชาชน 13 หลัก เช่น 1234567890123"
       />
     </SimpleForm>
   </Create>
